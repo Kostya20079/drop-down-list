@@ -2,8 +2,8 @@ class CustomSelect {
 #id
 #options
 #selectButton
-#selectUl
 #select
+#selectUl
 
     static #defoultText = { // текст для кнопки
         buttonText: 'Виберіть елемент'
@@ -11,12 +11,35 @@ class CustomSelect {
 
     constructor(id, options = []) {
         this.#selectButton = document.createElement('button')
-        this.#selectUl = document.createElement('ul')
         this.#select = document.createElement('select')
+        this.#selectUl = document.createElement('ul')
+        this.#select.id = this.#id
+        this.#select.style.display = 'none'
 
         this.#id = id
         this.#options = options
     }
+
+    //! list
+    #renderSelect(container) {
+        const classListId = `select-dropdown__list--${this.#id}`
+        this.#selectUl.className = `select-dropdown__list ${classListId}` // додаю класи для ul елементу
+
+        // створую сам список
+        this.#options.forEach((option) => {
+            const liItem = document.createElement('li')
+            liItem.className = 'select-dropdown__list-item'
+            liItem.dataset.value = option.value
+            liItem.textContent = option.text
+
+            this.#selectUl.append(liItem)
+        })
+
+        if(container) {
+            container.append(this.#selectUl)
+        }
+    }
+
 
 
     //! select Button
@@ -29,9 +52,15 @@ class CustomSelect {
 
         this.#selectButton.append(selectButtonText)
         container.append(this.#selectButton)
+
+        this.#selectButton.addEventListener('click', this.#toShowdropDownToggle.bind(this))
     }
 
-    
+    #toShowdropDownToggle() {
+        this.#selectUl.classList.toggle('active')
+    }
+
+
 
     //! render
     // тут додаю елементи в загальний контейнер
@@ -41,6 +70,7 @@ class CustomSelect {
 
         if(container) {
             this.#renderSelectButton(selectDropDownContainer)
+            this.#renderSelect(selectDropDownContainer)
             container.append(selectDropDownContainer)
         }
     }
