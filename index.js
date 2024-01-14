@@ -1,15 +1,48 @@
 class CustomSelect {
 #id
 #options
+#selectButton
+#selectUl
+#select
 
+    static #defoultText = { // текст для кнопки
+        buttonText: 'Виберіть елемент'
+    }
 
     constructor(id, options = []) {
+        this.#selectButton = document.createElement('button')
+        this.#selectUl = document.createElement('ul')
+        this.#select = document.createElement('select')
+
         this.#id = id
         this.#options = options
     }
 
-    render(container) {
 
+    //! select Button
+    #renderSelectButton(container) {
+        this.#selectButton.className = `select-dropdown__button select-dropdown__button--${this.#id}` // додаю клас 
+        
+        const selectButtonText = document.createElement('span') // створую внутрішню оболонку для тексту
+        selectButtonText.className = `select-dropdown select-dropdown--${this.#id}`
+        selectButtonText.textContent = CustomSelect.#defoultText.buttonText
+
+        this.#selectButton.append(selectButtonText)
+        container.append(this.#selectButton)
+    }
+
+    
+
+    //! render
+    // тут додаю елементи в загальний контейнер
+    render(container) {
+        const selectDropDownContainer = document.createElement('div')
+        selectDropDownContainer.className =`select-dropdown select-dropdown--${this.#id}`
+
+        if(container) {
+            this.#renderSelectButton(selectDropDownContainer)
+            container.append(selectDropDownContainer)
+        }
     }
 }
 
