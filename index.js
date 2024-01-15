@@ -4,9 +4,10 @@ class CustomSelect {
 #selectButton
 #select
 #selectUl
+#currentSelectedItem
 
     static #defoultText = { // текст для кнопки
-        buttonText: 'Виберіть елемент'
+        buttonText: 'Виберіть елемент',
     }
 
     constructor(id, options = []) {
@@ -18,19 +19,27 @@ class CustomSelect {
 
         this.#id = id
         this.#options = options
+        this.#currentSelectedItem = null
     }
+
+    get selectedValue() {
+        return this.#currentSelectedItem
+    }
+
 
     //! list
     #renderSelect(container) {
         const classListId = `select-dropdown__list--${this.#id}`
         this.#selectUl.className = `select-dropdown__list ${classListId}` // додаю класи для ul елементу
 
-        // створую сам список
+        // створую список
         this.#options.forEach((option) => {
             const liItem = document.createElement('li')
             liItem.className = 'select-dropdown__list-item'
             liItem.dataset.value = option.value
             liItem.textContent = option.text
+
+            liItem.addEventListener('click', this.#dropDownItemSelect.bind(this))
 
             this.#selectUl.append(liItem)
         })
@@ -41,13 +50,12 @@ class CustomSelect {
     }
 
 
-
     //! select Button
     #renderSelectButton(container) {
         this.#selectButton.className = `select-dropdown__button select-dropdown__button--${this.#id}` // додаю клас 
         
         const selectButtonText = document.createElement('span') // створую внутрішню оболонку для тексту
-        selectButtonText.className = `select-dropdown select-dropdown--${this.#id}`
+        selectButtonText.className = `select-dropdown__text select-dropdown__text--${this.#id}`
         selectButtonText.textContent = CustomSelect.#defoultText.buttonText
 
         this.#selectButton.append(selectButtonText)
@@ -61,9 +69,30 @@ class CustomSelect {
     }
 
 
+    //! додаю вибраний елемент
+    #dropDownItemSelect(event) {
+        const { target } = event
+        const getDataValue = target.getAttribute('data-value')
+        const targetOption = this.#options.find((option) => option.value === Number(getDataValue))
+        const selectButtonText = this.#selectButton.querySelector('.select-dropdown__text')
+
+        if(selectButtonText && targetOption && getDataValue) {
+            this.#currentSelectedItem = targetOption
+
+            const alLiItems = document.querySelectorAll('.select-dropdown__list-item')
+
+            alLiItems.forEach((itemOption) => itemOption.classList.remove('selected'))
+            target.classList.add('selected')
+
+            selectButtonText.textContent = targetOption.text
+            this.#selectUl.classList.remove('active')
+        }
+    }
+        
+
 
     //! render
-    // тут додаю елементи в загальний контейнер
+    // додаю елементи в загальний контейнер
     render(container) {
         const selectDropDownContainer = document.createElement('div')
         selectDropDownContainer.className =`select-dropdown select-dropdown--${this.#id}`
@@ -76,10 +105,7 @@ class CustomSelect {
     }
 }
 
-
-
-
-
+//! опції для вибору
 const options = [
     { value: 1, text: 'JavaScript' },
     { value: 2, text: 'NodeJS' },
